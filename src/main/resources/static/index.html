@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Online Job Portal</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <h1>Online Job Portal</h1>
+
+    <h2>Add a Job</h2>
+
+    <input type="text" id="title" placeholder="Job Title">
+    <input type="text" id="company" placeholder="Company">
+    <input type="text" id="location" placeholder="Location">
+    <input type="text" id="description" placeholder="Description">
+
+    <button onclick="addJob()">Add Job</button>
+
+    <h2>Available Jobs</h2>
+
+    <div id="jobs"></div>
+
+    <script>
+
+        function loadJobs() {
+
+            fetch("/jobs")
+                .then(response => response.json())
+                .then(jobs => {
+
+                    const jobsDiv = document.getElementById("jobs");
+
+                    jobsDiv.innerHTML = "";
+
+                    jobs.forEach(job => {
+
+                        const jobCard = document.createElement("div");
+
+                        jobCard.innerHTML = `
+                            <h3>${job.title}</h3>
+                            <p><b>Company:</b> ${job.company}</p>
+                            <p><b>Location:</b> ${job.location}</p>
+                            <p>${job.description}</p>
+                        `;
+
+                        jobsDiv.appendChild(jobCard);
+                    });
+                });
+        }
+
+        function addJob() {
+
+            const job = {
+                title: document.getElementById("title").value,
+                company: document.getElementById("company").value,
+                location: document.getElementById("location").value,
+                description: document.getElementById("description").value
+            };
+
+            fetch("/jobs", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(job)
+            })
+            .then(response => response.json())
+            .then(() => {
+
+                document.getElementById("title").value = "";
+                document.getElementById("company").value = "";
+                document.getElementById("location").value = "";
+                document.getElementById("description").value = "";
+
+                loadJobs();
+            });
+        }
+
+        loadJobs();
+
+    </script>
+
+</body>
+</html>
